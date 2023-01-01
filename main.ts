@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf} from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -12,14 +12,36 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	leftIndex: number = 0;
+	rightIndex: number = 0;
 
 	async onload() {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+			const rightSplitRoot = this.app.workspace.getLeavesOfType('outline')[0].getRoot()
+			const leftSplitRoot = this.app.workspace.getLeavesOfType('search')[0].getRoot()
+
+			const leaves : WorkspaceLeaf[] = []
+			this.app.workspace.iterateAllLeaves(l => { leaves.push(l) })
+
+			const rightLeaves = leaves
+				.filter(l => l.getRoot() === rightSplitRoot)
+				.filter(l => l.view.getViewType() !== 'empty')
+			const leftLeaves = leaves
+				.filter(l => l.getRoot() === leftSplitRoot)
+				.filter(l => l.view.getViewType() !== 'empty')
+
+			new Notice("right length:" + rightLeaves.length.toString())
+			new Notice("left length:" + leftLeaves.length.toString())
+
+			if (this.rightIndex >= rightLeaves.length) this.rightIndex = 0
+			this.app.workspace.revealLeaf(rightLeaves[this.rightIndex])
+			this.rightIndex = this.rightIndex + 1
+
+			// this.app.workspace.iterateAllLeaves(leaf => {
+			// 	if (leaf.getRoot() === rightSplitRoot) new Notice("match right root") })
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
