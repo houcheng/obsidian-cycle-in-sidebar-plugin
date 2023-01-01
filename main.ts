@@ -15,76 +15,43 @@ export default class MyPlugin extends Plugin {
 	leftIndex: number = 0;
 	rightIndex: number = 0;
 
+	getLeavesOfSidebar(viewTypeName: string) {
+		const oneSideSplitRoot = this.app.workspace.getLeavesOfType(viewTypeName)[0].getRoot()
+		const leaves : WorkspaceLeaf[] = []
+		this.app.workspace.iterateAllLeaves(l => { leaves.push(l) })
+		return leaves
+			.filter(l => l.getRoot() === oneSideSplitRoot)
+			.filter(l => l.view.getViewType() !== 'empty')
+	};
+	async cycleRightSideBar () {
+		const rightLeaves = this.getLeavesOfSidebar('outline')
+		if (this.rightIndex >= rightLeaves.length) this.rightIndex = 0
+
+		// new Notice(rightLeaves[this.rightIndex].view.getViewType())
+		this.app.workspace.revealLeaf(rightLeaves[this.rightIndex++])
+	};
+	async cycleLeftSideBar () {
+		const leftLeaves = this.getLeavesOfSidebar('search')
+		if (this.leftIndex >= leftLeaves.length) this.leftIndex = 0
+
+		// new Notice(leftLeaves[this.rightIndex].view.getViewType())
+		this.app.workspace.revealLeaf(leftLeaves[this.leftIndex++])
+	};
+
+
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			const rightSplitRoot = this.app.workspace.getLeavesOfType('outline')[0].getRoot()
-			const leftSplitRoot = this.app.workspace.getLeavesOfType('search')[0].getRoot()
-
-			const leaves : WorkspaceLeaf[] = []
-			this.app.workspace.iterateAllLeaves(l => { leaves.push(l) })
-
-			const rightLeaves = leaves
-				.filter(l => l.getRoot() === rightSplitRoot)
-				.filter(l => l.view.getViewType() !== 'empty')
-			const leftLeaves = leaves
-				.filter(l => l.getRoot() === leftSplitRoot)
-				.filter(l => l.view.getViewType() !== 'empty')
-
-			new Notice("right length:" + rightLeaves.length.toString())
-			new Notice("left length:" + leftLeaves.length.toString())
-
-			if (this.rightIndex >= rightLeaves.length) this.rightIndex = 0
-			this.app.workspace.revealLeaf(rightLeaves[this.rightIndex])
-			this.rightIndex = this.rightIndex + 1
-
-			// this.app.workspace.iterateAllLeaves(leaf => {
-			// 	if (leaf.getRoot() === rightSplitRoot) new Notice("match right root") })
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
+			id: 'cycle-right-sidebar',
+			name: 'Cycle tabs of right sidebar',
+			callback: () => { this.cycleRightSideBar() }
 		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-			}
+		this.addCommand({
+			id: 'cycle-left-sidebar',
+			name: 'Cycle tabs of left sidebar',
+			callback: () => { this.cycleLeftSideBar() }
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
