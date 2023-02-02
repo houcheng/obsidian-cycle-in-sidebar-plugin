@@ -1,11 +1,10 @@
 {
-	"id": "obsidian-cycle-in-sidebar-plugin",
+	"id": "cycle-in-sidebar",
 	"name": "Cycle In Sidebar Plugin",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "This a plugin provides hotkeys to cycle through tabs in the left or right sidebars.",
 	"author": "Houcheng",
 	"authorUrl": "https://github.com/houcheng/obsidian-cycle-in-sidebar-plugin",
-	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }
