@@ -8,4 +8,10 @@ In the Settings> Hotkeys>, assign keyboard shortcuts to the following two comman
 
 - Cycle tabs of left sidebar: ctrl + [
 - Cycle tabs of right sidebar: ctrl + ]
+- Cycle tabs of left sidebar reverse: ctrl + shift + [
+- Cycle tabs of right sidebar reverse: ctrl + shift + ]
+
+
+
+
 

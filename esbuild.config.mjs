@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from 'builtin-modules'
+import {copyFileSync} from "fs";
 
 const banner =
 `/*
@@ -10,7 +11,7 @@ if you want to view the source, please visit the github repository of this plugi
 `;
 
 const prod = (process.argv[2] === 'production');
-
+const devPlugins = '../obsidian-develop-vault/.obsidian/plugins/cycle-in-sidebar'
 esbuild.build({
 	banner: {
 		js: banner,
@@ -33,10 +34,19 @@ esbuild.build({
 		'@lezer/lr',
 		...builtins],
 	format: 'cjs',
-	watch: !prod,
+	watch: {
+		onRebuild(error, result) {
+			const files = ['main.js', 'manifest.json', 'styles.css'];
+			files.forEach(file => {
+				console.log('writes to', devPlugins + '/' + file)
+				copyFileSync(file, devPlugins + '/' + file);
+			})
+		}
+	},
 	target: 'es2018',
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
 	outfile: 'main.js',
+}).then(() => {
 }).catch(() => process.exit(1));

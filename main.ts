@@ -10,22 +10,26 @@ export default class CycleInSidebarPlugin extends Plugin {
 			.filter(l => l.view.getViewType() !== 'empty')
 	};
 
-	cycleInSideBar (split: WorkspaceSidedock) {
+	isSidebarOpen (split: WorkspaceSidedock) {
+		return this.getLeavesOfSidebar(split).some(l => l.view.containerEl.clientHeight > 0)
+	}
+	cycleInSideBar (split: WorkspaceSidedock, offset: number) {
 		const leaves = this.getLeavesOfSidebar(split)
 		var currentIndex = 0;
-		for (; currentIndex < leaves.length; currentIndex ++) {
-			if(leaves[currentIndex].view.containerEl.clientHeight > 0) break;
+		for (; currentIndex < leaves.length; currentIndex++) {
+			if (leaves[currentIndex].view.containerEl.clientHeight > 0) break;
 		}
 		if (currentIndex == leaves.length) return;
-		const nextIndex = (currentIndex + 1) % leaves.length;
+		const nextIndex = ((currentIndex + offset) < 0 ? (leaves.length - 1) : (currentIndex + offset)) % leaves.length;
 		this.app.workspace.revealLeaf(leaves[nextIndex]);
 	}
 
-	async cycleRightSideBar () {
-		this.cycleInSideBar(this.app.workspace.rightSplit);
+	async cycleRightSideBar (offset: number) {
+		this.cycleInSideBar(this.app.workspace.rightSplit, offset);
+
 	};
-	async cycleLeftSideBar () {
-		this.cycleInSideBar(this.app.workspace.leftSplit);
+	async cycleLeftSideBar (offset: number) {
+		this.cycleInSideBar(this.app.workspace.leftSplit, offset);
 	};
 
 
@@ -33,13 +37,23 @@ export default class CycleInSidebarPlugin extends Plugin {
 		this.addCommand({
 			id: 'cycle-right-sidebar',
 			name: 'Cycle tabs of right sidebar',
-			callback: () => { this.cycleRightSideBar() }
+			callback: () => { this.cycleRightSideBar(1) }
+		});
+		this.addCommand({
+			id: 'cycle-right-sidebar-reverse',
+			name: 'Cycle tabs of right sidebar in reverse',
+			callback: () => { this.cycleRightSideBar(-1) }
 		});
 
 		this.addCommand({
 			id: 'cycle-left-sidebar',
 			name: 'Cycle tabs of left sidebar',
-			callback: () => { this.cycleLeftSideBar() }
+			callback: () => { this.cycleLeftSideBar(1) }
+		});
+		this.addCommand({
+			id: 'cycle-left-sidebar-reverse',
+			name: 'Cycle tabs of left sidebar in reverse',
+			callback: () => { this.cycleLeftSideBar(-1) }
 		});
 	}
 
