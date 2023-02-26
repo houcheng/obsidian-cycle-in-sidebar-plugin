@@ -1,6 +1,6 @@
 {
-	"name": "obsidian-cycle-in-sidebar-plugin",
-	"version": "1.0.0",
+	"name": "Cycle In Sidebar",
+	"version": "1.0.1",
 	"description": "This is a Obsidian plugin for adding a cycle sidebar command",
 	"main": "main.js",
 	"scripts": {
