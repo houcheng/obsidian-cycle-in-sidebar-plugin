@@ -22,3 +22,8 @@ data.json
 .DS_Store
 
 .obsidian
+.aider*
+.env
+.repomix*
+repomix*
+test-vault/

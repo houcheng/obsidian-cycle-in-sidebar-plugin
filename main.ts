@@ -5,10 +5,15 @@ export default class CycleInSidebarPlugin extends Plugin {
 		const oneSideSplitRoot = split.getRoot()
 		const leaves : WorkspaceLeaf[] = []
 		this.app.workspace.iterateAllLeaves(l => { leaves.push(l) })
-		return leaves
+		const leavesInOneSide = leaves
 			.filter(l => l.getRoot() === oneSideSplitRoot)
-			.filter(l => l.view.getViewType() !== 'empty')
-	};
+			.filter(l => l.view.getViewType() !== 'empty');
+		if (leavesInOneSide.length == 0) return leaves;
+
+		// filter only first container (if top/ bottom views)
+		const parent = leavesInOneSide[0].parent
+		return leavesInOneSide.filter(l => l.parent == parent);
+	}
 
 	isSidebarOpen (split: WorkspaceSidedock) {
 		return this.getLeavesOfSidebar(split).some(l => l.view.containerEl.clientHeight > 0)
@@ -16,7 +21,7 @@ export default class CycleInSidebarPlugin extends Plugin {
 	cycleInSideBar (split: WorkspaceSidedock, offset: number) {
 		const leaves = this.getLeavesOfSidebar(split)
 		var currentIndex = 0;
-		for (; currentIndex < leaves.length; currentIndex++) {
+		for (currentIndex = 0; currentIndex < leaves.length; currentIndex++) {
 			if (leaves[currentIndex].view.containerEl.clientHeight > 0) break;
 		}
 		if (currentIndex == leaves.length) return;
@@ -27,10 +32,10 @@ export default class CycleInSidebarPlugin extends Plugin {
 	async cycleRightSideBar (offset: number) {
 		this.cycleInSideBar(this.app.workspace.rightSplit, offset);
 
-	};
+	}
 	async cycleLeftSideBar (offset: number) {
 		this.cycleInSideBar(this.app.workspace.leftSplit, offset);
-	};
+	}
 
 
 	async onload() {
